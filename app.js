@@ -743,7 +743,15 @@ function initApiBase() {
   const storedToken = localStorage.getItem("apiToken");
   const urlParam = new URLSearchParams(window.location.search).get("api");
   const urlToken = new URLSearchParams(window.location.search).get("token");
-  state.apiBase = sanitizeBaseUrl(urlParam || stored || DEFAULT_API_BASE);
+  const hostname = window.location.hostname || "";
+  const defaultBase = hostname.endsWith("netlify.app") || hostname.endsWith("netlify.com")
+    ? "/api"
+    : DEFAULT_API_BASE;
+  let base = urlParam || stored || defaultBase;
+  if (!urlParam && stored === DEFAULT_API_BASE && defaultBase === "/api") {
+    base = defaultBase;
+  }
+  state.apiBase = sanitizeBaseUrl(base);
   elements.apiBase.value = state.apiBase;
   state.apiToken = (urlToken || storedToken || DEFAULT_API_TOKEN || "").trim();
   if (state.apiToken) {
