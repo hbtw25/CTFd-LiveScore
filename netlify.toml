@@ -1,8 +1,9 @@
 [build]
   publish = "."
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/api/*"
-  to = "https://adikara.online/api/v1/:splat"
+  to = "/.netlify/functions/proxy/:splat"
   status = 200
   force = true
