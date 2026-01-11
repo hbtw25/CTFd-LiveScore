@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Adikara CTF Live Scoreboard</title>
+    <meta name="description" content="Live scoreboard for Adikara CTFd with highlights and first blood alerts.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">A</div>
+        <div>
+          <p class="brand-title">Adikara CTF Live</p>
+          <p class="brand-subtitle">Scoreboard + First Blood</p>
+        </div>
+      </div>
+      <div class="status">
+        <span class="status-dot" id="status-dot"></span>
+        <span class="status-text" id="status-text">Connecting...</span>
+        <span class="status-meta" id="last-update">--:--</span>
+      </div>
+      <div class="event-timer" id="event-timer">
+        <span class="event-label" id="event-label">Event</span>
+        <span class="event-countdown" id="event-countdown">--:--:--</span>
+        <span class="event-freeze" id="event-freeze"></span>
+      </div>
+      <div class="actions">
+        <button class="ghost" id="refresh-btn">Refresh Now</button>
+        <button class="ghost" id="demo-btn">Demo Data</button>
+        <button class="ghost" id="toggle-mode">Broadcast Mode</button>
+        <button class="ghost" id="fullscreen-btn">Fullscreen</button>
+        <div class="countdown">Next update in <span id="refresh-timer">30</span>s</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-text">
+          <h1>Live Scoreboard</h1>
+          <div class="hero-controls">
+            <label class="control">
+              <span>API Base</span>
+              <input type="text" id="api-base" placeholder="https://adikara.online/api/v1">
+            </label>
+            <label class="control">
+              <span>API Token</span>
+              <input type="password" id="api-token" placeholder="ctfd_...">
+            </label>
+            <button class="primary" id="save-api">Apply</button>
+          </div>
+          <div class="api-note">
+            <span>Default endpoint:</span>
+            <code>https://adikara.online/api/v1</code>
+            <span>Netlify proxy:</span>
+            <code>/api</code>
+          </div>
+        </div>
+        <div class="hero-cards">
+          <div class="stat-card">
+            <p class="stat-label">Total Participants</p>
+            <p class="stat-value" id="stat-teams">0</p>
+            <p class="stat-foot">Active on the board</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Top Player</p>
+            <p class="stat-value" id="stat-top-score">0</p>
+            <p class="stat-foot" id="stat-top-team">--</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-label">Total Points</p>
+            <p class="stat-value" id="stat-total">0</p>
+            <p class="stat-foot">Accumulated</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <section class="panel podium">
+          <div class="panel-header">
+            <h2>Podium</h2>
+            <span class="pill">Top 3</span>
+          </div>
+          <div class="podium-grid" id="podium"></div>
+        </section>
+
+        <section class="panel scoreboard">
+          <div class="panel-header">
+            <h2>Scoreboard</h2>
+            <div class="panel-actions">
+              <input class="search" id="search" type="search" placeholder="Cari peserta...">
+              <select id="limit-select" class="select">
+                <option value="10">Top 10</option>
+                <option value="25">Top 25</option>
+                <option value="50">Top 50</option>
+                <option value="0">All</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrapper" id="scoreboard-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Participant</th>
+                  <th>Score</th>
+                  <th>Last Solve</th>
+                </tr>
+              </thead>
+              <tbody id="scoreboard-body"></tbody>
+            </table>
+          </div>
+          <p class="panel-foot" id="scoreboard-foot">Live sync in progress...</p>
+        </section>
+
+        <section class="panel highlights">
+          <div class="panel-header">
+            <h2>First Blood</h2>
+            <span class="pill glow">Live Alerts</span>
+          </div>
+          <div class="highlight-list" id="first-blood-list"></div>
+        </section>
+
+        <section class="panel distribution">
+          <div class="panel-header">
+            <h2>Score Distribution</h2>
+            <span class="pill">Stats</span>
+          </div>
+          <div class="distribution-chart" id="score-distribution"></div>
+        </section>
+
+        <section class="panel notifications">
+          <div class="panel-header">
+            <h2>Activity Feed</h2>
+            <span class="pill">Updates</span>
+          </div>
+          <div class="highlight-list" id="activity-list"></div>
+        </section>
+
+      </section>
+    </main>
+
+    <footer>
+      <p>Built for Adikara CTFd. Live updates every 30 seconds.</p>
+    </footer>
+
+    <div class="first-blood-overlay" id="first-blood-overlay" aria-live="polite">
+      <div class="first-blood-card">
+        <div class="first-blood-eyebrow">First Blood</div>
+        <h3 id="first-blood-title">First Blood!</h3>
+        <p id="first-blood-desc">--</p>
+        <div class="first-blood-meta" id="first-blood-meta">--</div>
+      </div>
+    </div>
+    <audio id="first-blood-audio" preload="auto" src="firstbload_sound.mp3"></audio>
+
+    <script src="app.js"></script>
+  </body>
+</html>
